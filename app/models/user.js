@@ -3,9 +3,9 @@ var Schema = mongoose.Schema;
 
 var UserSchema = new Schema ({
 	name: String,
-	StoresVisited: Array,
 	createdAt: String,
-	facebookId: String
+	facebookId: String,
+	type: String
 })
 
 var User = mongoose.model('User', UserSchema);

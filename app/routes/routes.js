@@ -13,7 +13,48 @@ var User = mongoose.model('User'),
 module.exports = function(app) {
 
 	app.get('/', function(req, res){
-		res.send("<h1> Hello </h1")
+		res.send("<h1> Hello </h1>")
+	});
+
+	app.post('/login/:fbid', function(req, res){
+		//hardcoded data ---
+		 var name = "Sridatt"
+		// var fbid = "asdfasdf"
+		//
+		console.log("gets in login")
+
+		//var sid = req.sessionID;
+		//console.log(session.secret)
+
+		User.find({
+			facebookId: req.params.fbid
+		}, function(err, result){
+			if (err) { console.log(err) }
+
+			if (result.length == 0){
+				var d = new Date();
+				User.create({
+					name: name,
+					createdAt: d,
+					facebookId: req.params.fbid,	
+					type: ""
+				}, function(err, result){
+					console.log("just created one")
+					console.log(result);
+					res.send(result)
+				})
+			}
+
+			else {
+				console.log("found user in database")
+				res.send(result);
+			}
+		})
+	})
+
+	app.get('/logout', function(req, res){
+		req.session.destroy();
+		res.send("session destroyed")
 	})
 
 	app.post('/createUser', function(req, res){
@@ -25,7 +66,6 @@ module.exports = function(app) {
 		var d = new Date();
 		User.create({
 			name: name,
-			storesVisited: [],
 			createdAt: d,
 			facebookId: fbid
 		}, function(err, result){
@@ -51,27 +91,22 @@ module.exports = function(app) {
 		})
 	})
 
-	app.post('/createItem', function(req, res){
-		//hardcoded data---
-		var item = "pen"
-		var category = "Office Supplies"
-		var price = 2.99;
-		//-----------------
+	app.post('/createItem/:businessId', function(req, res){
+
+		console.log(req.body);
+		console.log(req.body.item);
+		console.log(req.body.category);
+		console.log(req.body.price);
 
 		Item.create({
-			item: item,
-			category: category,
-			price: price
+			item: req.body.item,
+			category: req.body.category,
+			price: req.body.price,
+			business: req.params.businessId
 		}, function(err, result){
-			console.log(result);
-			res.send(result);
-		})
-	})
+			if (err){console.log(err)}
 
-	app.get('/getItemInfo/:itemId', function(req, res){
-		Item.find({
-			_id: req.params.itemId
-		}, function(err, result){
+			console.log(result);
 			res.send(result);
 		})
 	})
@@ -118,6 +153,14 @@ module.exports = function(app) {
 					console.log(result)
 				});
 			}
+		})
+	})
+
+	app.get('/getItemInfo/:itemId', function(req, res){
+		Item.find({
+			_id: req.params.itemId
+		}, function(err, result){
+			res.send(result);
 		})
 	})
 
@@ -173,7 +216,6 @@ module.exports = function(app) {
 
 			else {
 				var users = [];
-				//console.log(result[0].userId)
 				for (var i = 0; i < result.length; i++){
 					users.push(result[i].userId);
 					console.log(users);
@@ -182,7 +224,5 @@ module.exports = function(app) {
 			}
 		})
 	})
-
-	app.get('/')
 
 }
