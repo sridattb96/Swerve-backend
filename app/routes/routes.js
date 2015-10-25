@@ -179,7 +179,7 @@ module.exports = function(app) {
 			if (result.length == 0){
 				res.send("You haven't shopped anywhere yet!");
 			}
-
+ty
 			else {
 				res.send(result);
 			}
