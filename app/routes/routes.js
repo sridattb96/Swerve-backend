@@ -57,20 +57,28 @@ module.exports = function(app) {
 		res.send("session destroyed")
 	})
 
-	app.post('/createUser', function(req, res){
-		//hardcoded data ---
-		var name = "Sridatt"
-		var fbid = "fbid"
-		//
+	// app.post('/createUser', function(req, res){
+	// 	//hardcoded data ---
+	// 	var name = "Sridatt"
+	// 	var fbid = "fbid"
+	// 	//
 
-		var d = new Date();
-		User.create({
-			name: name,
-			createdAt: d,
-			facebookId: fbid
+	// 	var d = new Date();
+	// 	User.create({
+	// 		name: name,
+	// 		createdAt: d,
+	// 		facebookId: fbid
+	// 	}, function(err, result){
+	// 		console.log(result);
+	// 		res.send(result);
+	// 	})
+	// })
+
+	app.post('/markType/:fbid/:type', function(req, res){
+		User.update({ facebookId: req.params.fbid }, {
+			type: req.params.type
 		}, function(err, result){
-			console.log(result);
-			res.send(result);
+			console.log(result)
 		})
 	})
 
