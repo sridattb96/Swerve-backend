@@ -16,22 +16,20 @@ module.exports = function(app) {
 		res.send("<h1> Hello </h1>")
 	});
 
+	//***HARDCODE
 	app.post('/login/:fbid', function(req, res){
 		//hardcoded data ---
-		 var name = "Sridatt"
+		var name = "Sridatt"
 		// var fbid = "asdfasdf"
 		//
 		console.log("gets in login")
 
-		//var sid = req.sessionID;
-		//console.log(session.secret)
-
 		User.find({
 			facebookId: req.params.fbid
 		}, function(err, result){
-			if (err) { console.log(err) }
+			if (err) { console.log(err); res.send({error:true})}
 
-			if (result.length == 0){
+			else if (result.length == 0){
 				var d = new Date();
 				User.create({
 					name: name,
@@ -41,13 +39,14 @@ module.exports = function(app) {
 				}, function(err, result){
 					console.log("just created one")
 					console.log(result);
-					res.send(result)
+					var arr = [result];
+					res.send(arr) //wrap in array
 				})
 			}
 
 			else {
 				console.log("found user in database")
-				res.send(result);
+				res.send(result); 
 			}
 		})
 	})
@@ -75,13 +74,20 @@ module.exports = function(app) {
 	// })
 
 	app.post('/markType/:fbid/:type', function(req, res){
+		console.log("inside markType")
 		User.update({ facebookId: req.params.fbid }, {
 			type: req.params.type
 		}, function(err, result){
-			console.log(result)
+			if (result.length == 0){
+				res.send({ error: true });
+			}
+			else {
+				res.send(result)
+			}
 		})
 	})
 
+	//***HARDCODE
 	app.post('/createBusiness', function(req, res){
 		//hardcoded data---
 		var name = "Target";
@@ -101,11 +107,6 @@ module.exports = function(app) {
 
 	app.post('/createItem/:businessId', function(req, res){
 
-		console.log(req.body);
-		console.log(req.body.item);
-		console.log(req.body.category);
-		console.log(req.body.price);
-
 		Item.create({
 			item: req.body.item,
 			category: req.body.category,
@@ -119,35 +120,36 @@ module.exports = function(app) {
 		})
 	})
 
-	app.post('/checkout', function(req, res){
+	app.post('/checkout/:fbid', function(req, res){
+		console.log('inside checkout')
 		//hardcoded data ---
-		var items = [
-			{
-				itemId: "562c126151a68b745e27cc81",
-				count: 1
-			},
-			{
-				itemId: "562c16e6bdfad2ac5e3dd82b",
-				count: 2
-			},
-			{
-				itemId: "562c17160f194cb05e2dd0a6",
-				count: 1
-			}
-		];
+		// var items = [
+		// 	{
+		// 		itemId: "562c126151a68b745e27cc81",
+		// 		count: 1
+		// 	},
+		// 	{
+		// 		itemId: "562c16e6bdfad2ac5e3dd82b",
+		// 		count: 2
+		// 	},
+		// 	{
+		// 		itemId: "562c17160f194cb05e2dd0a6",
+		// 		count: 1
+		// 	}
+		// ];
 
-		var userId = "fbid";
-		var businessId = "targetid";
-		var totalPrice = 100
+		// var userId = "fbid";
+		// var businessId = "targetid";
+		// var totalPrice = 100
 		//--------------
 
 		var d = new Date();
 
 		Shopping.create({
-			userId: userId,
-			business: businessId,
-			shoppingList: items,
-			totalPrice: totalPrice,
+			userId: req.params.fbid,
+			business: req.body.businessId,
+			shoppingList: req.body.items,
+			totalPrice: req.body.totalPrice,
 			date: d
 		}, function(err, result){
 
@@ -232,5 +234,36 @@ module.exports = function(app) {
 			}
 		})
 	})
+
+	// app.get('/dataToVisualize/:businessId', function(req, res){
+	// 	ItemsPurchased.find({
+	// 		business: req.params.businessId
+	// 	}, function(err, result){
+	// 		var hash = {};
+	// 		for (var i = 0; i < result.length; i++){
+	// 			if (hash[result[i].item] > 0){
+	// 				hash[result[i].item]++;
+	// 			}
+	// 			else {	
+	// 				hash[result[i].item] = 0;
+	// 			}
+	// 		}
+
+	// 		var highest = 0;
+	// 		    var arr = [];
+	// 		    for (var prop in hash) {
+	// 		        if( hash.hasOwnProperty( prop ) ) {
+	// 		            if(hash[prop] > highest ){ 
+	// 		                arr = [];
+	// 		                highest = hash[prop];
+	// 		                arr[prop] = highest;
+	// 		            }
+
+	// 		        } 
+	// 		    }
+	// 		var str = result.length;
+	// 		res.send(str)
+	// 	})
+	// })
 
 }
